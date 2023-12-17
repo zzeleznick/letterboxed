@@ -4,6 +4,7 @@ import { search, search_exact } from "../src/trie";
 import {
   build_trie,
   deserialize_trie,
+  load_nyt_puzzle,
   load_trie,
   load_words,
   save_trie,
@@ -179,6 +180,14 @@ const test_deserialization = async () => {
   }
 };
 
+const test_load_nyt_puzzle = async () => {
+  const {
+    sides,
+    words,
+  } = await load_nyt_puzzle();
+  console.log(`Sides (${sides.length}): [${sides}], Word Count: ${words.length}`);
+}
+
 const main = async () => {
   const colwidth = 50;
   const tests_fncs = [
@@ -200,6 +209,7 @@ const main = async () => {
     }
     console.log(`${"=".repeat(colwidth)}`);
   }
+  await test_load_nyt_puzzle();
   // await test_serialization();
   // await test_deserialization();
 };

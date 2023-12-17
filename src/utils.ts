@@ -9,6 +9,8 @@ import {
 // Unix word list at /usr/share/dict/words
 const unix_word_list_path = "/usr/share/dict/words"
 const boggle_world_list_path = "./dict/boggle_words.txt"
+const nyt_url = "https://www.nytimes.com/puzzles/letter-boxed"
+
 const trie_path = "trie.json"
 
 // Remove proper names and short words from the word list
@@ -20,6 +22,24 @@ export const load_words = async (unix_path = true) => {
         w => 96 < w.charCodeAt(0) && w.charCodeAt(0) < 123 // a is 97, z is 122
         && w.length > 2 // min of 3 letter words
     ).concat(["quays", "stromboli"])
+}
+
+export const load_nyt_puzzle = async () => {
+    const response = await fetch(nyt_url);
+    const text = await response.text();
+    const sidesRegex = /\"sides\":\[\"(?<sides>[\"A-Z,]+)\]/;
+    const dictRegex = /(?:\"dictionary\":\[)(?<words>[\"A-Z,]+)\]/;
+    const sidesRaw = text.match(sidesRegex)?.groups?.sides;
+    const dictRaw = text.match(dictRegex)?.groups?.words
+    if (! sidesRaw || ! dictRaw) {
+        throw new Error("Could not parse NYT puzzle!");
+    }
+    const sides = sidesRaw.replaceAll('"', '').split(",");
+    const words = dictRaw.replaceAll('"', '').split(",");
+    return {
+        words,
+        sides,
+    }
 }
 
 export const save_trie = async () => {
